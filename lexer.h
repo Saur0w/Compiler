@@ -19,41 +19,69 @@ enum class TokenType {
     LBrace, RBrace,
     Comma, Period, Semicolon,
 
-    // Delimiters
+    // Operators
     Plus, Minus, Star, Slash, Mod,
     Assign,
     Equal,
+    NotEqual,
     LessThan, GreaterThan,
     LessThanEqual, GreaterThanEqual,
     And, Or, Not, Xor,
+
+    // Keywords
+    Function, Return,
+    If, Else, While,
+    Type, Let,
+    True, False,
+
+    // Variable Types (Keywords)
+    Int, Float, Bool, Str,
+    Short, Long, Signed, Unsigned,
+
+    // Literals
+    Identifier,
+    NumberLiteral,
+    StringLiteral
 };
 
-typedef struct location {
-    size_t line;
-    size_t col;
-} Location;
+struct Location {
+    size_t line = 1;
+    size_t col = 1;
+};
 
-typedef struct token_data {
-    Token type;
-    char *val;
+struct Token {
+    TokenType type;
+    std::string value;
     Location loc;
-} TokenData;
+    bool is(TokenType t) const {return type == t;}
+};
 
-typedef struct lexer {
-    char *start_tok;
-    char *cur_tok;
-    TokenData *tokens;
-    size_t line_number;
-    char *line_start;
-    size_t token_count;
-    size_t capacity;
+class Lexer {
+public:
+    explicit Lexer(std::string source);
 
-} Lexer;
+    std::vector<Token> tokenize();
 
-int lex(Lexer *lexer);
+    static std::string tokenToString(TokenType type);
 
-void free_lexer(Lexer *lexer);
+private:
+    std::string source;
+    std::vector<Token> tokens;
+    size_t cursor = 0;
+    size_t line = 1;
+    size_t lineStart = 0;
 
-char *token_to_string(Token token);
+    char advance();
+    char peek() const;
+    char peekNext() const;
+
+    void addToken(TokenType type, std::string value);
+    void skipWhitespace();
+
+    void scanIdentifier();
+    void scanNumber();
+    void scanString();
+
+};
 
 #endif //COMPILER_LEXER_H

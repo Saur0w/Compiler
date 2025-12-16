@@ -1,7 +1,3 @@
-//
-// Created by sthap on 16-12-2025.
-//
-
 #ifndef COMPILER_AST_H
 #define COMPILER_AST_H
 
@@ -10,25 +6,35 @@
 #include <memory>
 #include <iostream>
 
-struct AstNode {
-    virtual ~AstNode() = default;
+struct ASTNode {
+    virtual ~ASTNode() = default;
 };
 
-struct Expr : public AstNode {};
+struct Expr : public ASTNode {};
 
-struct NumberExpr : public AstNode {
+struct NumberExpr : public Expr {
     double value;
-    NumberExpr(double v) : value(v) {}
+    explicit NumberExpr(double v) : value(v) {}
 };
 
 struct StringExpr : public Expr {
     std::string value;
-    StringExpr(std::string v) : value(v) {}
+    explicit StringExpr(std::string v) : value(std::move(v)) {}
 };
 
 struct VariableExpr : public Expr {
     std::string name;
-    VaraibleExpr(std::string n) : name(std::move(v)) {}
+    explicit VariableExpr(std::string n) : name(std::move(n)) {}
+};
+
+
+struct BinaryExpr : public Expr {
+    std::unique_ptr<Expr> left;
+    std::string op; 
+    std::unique_ptr<Expr> right;
+    
+    BinaryExpr(std::unique_ptr<Expr> l, std::string o, std::unique_ptr<Expr> r)
+        : left(std::move(l)), op(std::move(o)), right(std::move(r)) {}
 };
 
 struct Stmt : public ASTNode {};
@@ -52,7 +58,13 @@ struct FunctionStmt : public Stmt {
 
 struct BlockStmt : public Stmt {
     std::vector<std::unique_ptr<Stmt>> statements;
-    BlockStmt(std::vector<std::unique_ptr<Stmt>> s) : statements(std::move(s)) {}
+    explicit BlockStmt(std::vector<std::unique_ptr<Stmt>> s) : statements(std::move(s)) {}
 };
 
-#endif //COMPILER_AST_H
+struct ExprStmt : public Stmt {
+    std::unique_ptr<Expr> expression;
+    explicit ExprStmt(std::unique_ptr<Expr> expr) : expression(std::move(expr)) {}
+};
+
+#endif
+

@@ -134,6 +134,8 @@ std::vector<Token> Lexer::tokenize() {
                 scanString();
                 break;
 
+            case ':': addToken(TokenType::Colon, ":"); advance(); break;
+
             default:
                 if (isdigit(c)) {
                     scanNumber();
@@ -233,6 +235,7 @@ std::string Lexer::tokenToString(TokenType type) {
         case TokenType::Return: return "Return";
         case TokenType::Let: return "Let";
         case TokenType::Int: return "Int";
+
 
         default: return "Token";
     }

@@ -17,7 +17,7 @@ enum class TokenType {
     // Delimiters
     LParen, RParen,
     LBrace, RBrace,
-    Comma, Period, Semicolon,
+    Comma, Period, Semicolon, Colon,
 
     // Operators
     Plus, Minus, Star, Slash, Mod,

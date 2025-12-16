@@ -189,7 +189,51 @@ void Lexer::scanString() {
 
 void Lexer::scanNumber() {
     size_t start = cursor;
-    while (isdigit(peek())) addToken();
+    while (isdigit(peek())) advance();
 
-    if (peek() == '.' && isdigit(peekNext))
+    if (peek() == '.' && isdigit(peekNext())) {
+        advance();
+        while (isdigit(peek())) advance();
+    }
+
+    std::string value = source.substr(start, cursor - start);
+    addToken(TokenType::NumberLiteral, value);
+}
+
+void Lexer::scanIdentifier() {
+    size_t start = cursor;
+    while (isalnum(peek())  || peek() == '_') advance();
+
+    std::string text = source.substr(start, cursor - start);
+    TokenType type = TokenType::Identifier;
+
+    if (text == "fn") type = TokenType::Function;
+    else if (text == "return") type = TokenType::Return;
+    else if (text == "let") type = TokenType::Let;
+    else if (text == "true") type = TokenType::True;
+    else if (text == "false") type = TokenType::False;
+    else if (text == "if") type = TokenType::If;
+    else if (text == "else") type = TokenType::Else;
+    else if (text == "while") type = TokenType::While;
+
+    //data types
+    else if (text == "int") type = TokenType::Int;
+    else if (text == "float") type = TokenType::Float;
+    else if (text == "str") type = TokenType::Str;
+
+    addToken(type, text);
+}
+
+std::string Lexer::tokenToString(TokenType type) {
+    switch (type) {
+        case TokenType::Identifier: return "Identifier";
+        case TokenType::NumberLiteral: return "Number";
+        case TokenType::StringLiteral: return "String";
+        case TokenType::Function: return "Function";
+        case TokenType::Return: return "Return";
+        case TokenType::Let: return "Let";
+        case TokenType::Int: return "Int";
+
+        default: return "Token";
+    }
 }
